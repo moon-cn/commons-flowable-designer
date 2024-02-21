@@ -1,0 +1,36 @@
+{
+  "name": "crec-flowable",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "umi dev",
+    "start-legacy": "SET NODE_OPTIONS=--openssl-legacy-provider && umi dev",
+    "build": "umi build",
+    "cn": "npm config set registry https://registry.npmmirror.com"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^4.0.0",
+    "@ant-design/pro-components": "^2.0.0",
+    "@crec/lang": "^1.0.0-beta.10",
+    "antd": "^4.0.0",
+    "axios": "^1.6.7",
+    "bpmn-js": "^17.0.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "qs": "^6.11.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "umi": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.200",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@umijs/preset-react": "1.x",
+    "@umijs/test": "^3.5.19",
+    "cross-env": "^7.0.3",
+    "lint-staged": "^10.0.7",
+    "prettier": "^2.2.0",
+    "typescript": "^4.1.2",
+    "yorkie": "^2.0.0"
+  }
+}
