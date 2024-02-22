@@ -3,6 +3,7 @@ package cn.moon.flowable.designer.manager;
 import cn.moon.flowable.designer.tool.BpmnModelXmlTool;
 import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
+import org.flowable.engine.impl.form.LongFormType;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

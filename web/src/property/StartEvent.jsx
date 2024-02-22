@@ -4,6 +4,7 @@ import ModelerUtil from "../utils/ModelerUtil";
 import BaseForm from "./BaseForm";
 import StartEventTimer from "./StartEventTimer";
 import {ArrayTool} from "@crec/lang";
+import {getBusinessObject} from "bpmn-js/lib/util/ModelUtil";
 
 export default class extends React.Component {
 
@@ -35,22 +36,19 @@ class StartForm extends React.Component {
 
   columns = [
     {
+      dataIndex: 'id',
+      title: '标识',
+
+    },
+    {
       dataIndex: 'name',
       title: '名称',
 
     },
-    {
-      dataIndex: 'valueType',
-      title: '类型',
-      valueEnum: {
-        text: '字符串',
-        digit: '数值'
-      },
 
-    },
     {
-      dataIndex: 'label',
-      title: '显示文本',
+      dataIndex: 'type',
+      title: '类型',
 
     },
     {
@@ -69,7 +67,10 @@ class StartForm extends React.Component {
   }
 
   componentDidMount() {
-    const list = ModelerUtil.getForList(this.props.bo, 'conditionVariableList')
+    const bo = this.props.bo;
+    const list = bo.extensionElements.values
+    console.log(list)
+
     this.setState({list})
   }
 
@@ -86,12 +87,15 @@ class StartForm extends React.Component {
   }
 
   onFinish = (values) => {
+    values.$type = "flowable:formProperty"
     const {list} = this.state
     let newList = [...list, values];
 
     this.setState({list: newList, formOpen: false})
 
-    ModelerUtil.setForList(this.props.bo, 'conditionVariableList', newList)
+
+    this.props.bo.extensionElements.values = list;
+
   }
 
   formRef = React.createRef()
@@ -111,6 +115,7 @@ class StartForm extends React.Component {
         columns={this.columns}
         dataSource={this.state.list}
         pagination={false}
+        rowKey='id'
       >
       </Table>
 
@@ -123,17 +128,24 @@ class StartForm extends React.Component {
       >
 
         <Form ref={this.formRef} layout='horizontal' labelCol={{flex: '100px'}} onFinish={this.onFinish}>
+
+
+          <Form.Item name='id' label='标识' rules={[{required: true}]}>
+            <Input/>
+          </Form.Item>
+
           <Form.Item name='name' label='名称' rules={[{required: true}]}>
             <Input/>
           </Form.Item>
           <Form.Item name='valueType' label='类型' rules={[{required: true}]} initialValue='text'>
             <Radio.Group>
               <Radio value='text'>文本</Radio>
-              <Radio value='digit'>数字</Radio>
+              <Radio value='long'>整数</Radio>
+              <Radio value='double'>小数</Radio>
+              <Radio value='date'>日期</Radio>
+              <Radio value='boolean'>是否</Radio>
+              <Radio value='enum'>枚举</Radio>
             </Radio.Group>
-          </Form.Item>
-          <Form.Item name='label' label='显示文本' rules={[{required: true}]}>
-            <Input/>
           </Form.Item>
 
 
