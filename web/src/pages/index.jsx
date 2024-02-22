@@ -21,8 +21,6 @@ import OpenTool from "../tools/OpenTool";
 import XmlTool from "../tools/XmlTool";
 import SaveTool from "../tools/SaveTool";
 import {PropertyPanelMap} from "../property/registry";
-import ModelerUtil from "../utils/ModelerUtil";
-import ConditionVariableTool from "../tools/ConditionVariableTool";
 
 const {Panel} = Collapse;
 
@@ -116,9 +114,6 @@ export default class extends React.Component {
 
           <Button icon={<SaveOutlined/>} onClick={() => SaveTool.onSaveXml(this.bpmnModeler)}>保存</Button>
           <Button icon={<CloudUploadOutlined/>} onClick={() => SaveTool.onDeploy(this.bpmnModeler)}>部署</Button>
-          <Button icon={<BranchesOutlined/>}
-                  onClick={() => ConditionVariableTool.open(this.bpmnModeler)}>条件变量</Button>
-          <Button icon={<FormOutlined/>}>表单</Button>
           <Button onClick={() => XmlTool.onClick(this.bpmnModeler)}>XML</Button>
         </div>
         <span>
@@ -131,15 +126,13 @@ export default class extends React.Component {
         </Col>
 
         <Col flex='300px'>
-          <Card title='基本信息' extra={this.state.elementType}>
+          <Card title='通用' extra={this.state.elementType}>
             <div>标识：{this.state.elementId}</div>
             <div>名称：{this.state.elementName}</div>
           </Card>
-          <Card title='设置' style={{marginTop: 4}}>
-
+          <div style={{marginTop: 4}}>
             {this.renderForm()}
-
-          </Card>
+          </div>
 
         </Col>
       </Row>
