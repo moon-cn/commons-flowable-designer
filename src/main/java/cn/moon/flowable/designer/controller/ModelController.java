@@ -80,6 +80,7 @@ public class ModelController {
         } else {
             flowModel.setXml(new String(source, StandardCharsets.UTF_8));
         }
+        System.err.println(flowModel.getXml());
 
         return Result.ok().data(flowModel);
     }

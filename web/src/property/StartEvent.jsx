@@ -24,8 +24,8 @@ export default class extends React.Component {
 
 
   render() {
-    const {bo, element, modeling} = this.props
-    const childProps = {bo, element, modeling}
+    const {bo, element, modeling, moddle} = this.props
+    const childProps = {bo, element, modeling, moddle}
 
     // 定时启动事件单独处理
     if (ModelerUtil.isTimerStart(bo)) {
@@ -40,24 +40,24 @@ export default class extends React.Component {
 class StartForm extends React.Component {
 
   onValuesChange = (changed, values) => {
-    const {bo, element, modeling} = this.props
+    const {element, modeling, moddle} = this.props
 
     const {formProperties, formKey} = values;
 
     if (changed.formKey) {
-      ModelerUtil.updateProperties(modeling,element, {
-         formKey
+      ModelerUtil.updateProperties(modeling, element, {
+        formKey
       })
     }
     if (changed.formProperties) {
-      const $type = "flowable:formProperty"
-
-      var newCondition = moddle.create('bpmn:FormalExpression', {
-        body: '${ value > 100 }'
-      });
-
+      const props = formProperties.map(prop => {
+        const {id,name, type} = prop;
+        return moddle.create('flowable:FormProperty', {id,name, type});
+      })
       modeling.updateProperties(element, {
-        extensionElements: formProperties
+        extensionElements: {
+          values: props
+        }
       });
     }
   }

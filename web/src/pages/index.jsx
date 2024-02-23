@@ -15,7 +15,7 @@ import OpenTool from "../tools/OpenTool";
 import XmlTool from "../tools/XmlTool";
 import SaveTool from "../tools/SaveTool";
 import {PropertyPanelMap} from "../property/registry";
-
+import flowableDesc from '../resources/flowable.json'
 
 export default class extends React.Component {
 
@@ -29,7 +29,6 @@ export default class extends React.Component {
     elementId: null,
   }
 
-  curBo = null
   element = null
 
   componentDidMount() {
@@ -37,27 +36,29 @@ export default class extends React.Component {
     const id = params.id
 
 
-    window._bpmnModeler = this.bpmnModeler = new BpmnModeler({
+    const bpmnModeler = window._bpmnModeler = this.bpmnModeler = new BpmnModeler({
       additionalModules: [
         // 汉化翻译
         {
           translate: ['value', customTranslate]
         },
         contextPad,
-      ]
+      ],
+      moddleExtensions:{
+        flowable: flowableDesc
+      }
     });
 
 
     window._modeling = this.modeling = this.bpmnModeler.get('modeling'); // 建模， 包含很多方法
     window._moddle = this.moddle = this.bpmnModeler.get('moddle'); // 数据模型， 主要存储元数据
 
+
     if (!id) {
       OpenTool.open()
     } else {
       this.initById(id)
     }
-
-
   }
 
   initById = id => {
