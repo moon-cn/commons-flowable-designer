@@ -40,7 +40,7 @@ export default class extends React.Component {
 class StartForm extends React.Component {
 
   onValuesChange = (changed, values) => {
-    const {element, modeling, moddle} = this.props
+    const {element, bo, modeling, moddle} = this.props
 
     const {formProperties, formKey} = values;
 
@@ -48,17 +48,24 @@ class StartForm extends React.Component {
       ModelerUtil.updateProperties(modeling, element, {
         formKey
       })
+
+      return
     }
     if (changed.formProperties) {
+      // 忽略新增
+      for(let item of formProperties){
+        if(item === undefined){
+          console.log('忽略新增空行')
+          return;
+        }
+      }
+
       const props = formProperties.map(prop => {
         const {id,name, type} = prop;
         return moddle.create('flowable:FormProperty', {id,name, type});
       })
-      modeling.updateProperties(element, {
-        extensionElements: {
-          values: props
-        }
-      });
+      bo.extensionElements.set('values',props)
+
     }
   }
 
