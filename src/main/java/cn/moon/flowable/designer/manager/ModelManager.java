@@ -3,14 +3,13 @@ package cn.moon.flowable.designer.manager;
 import cn.moon.flowable.designer.tool.BpmnModelXmlTool;
 import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
-import org.flowable.engine.impl.form.LongFormType;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
 
 @Component
-public class FlowableModelManager {
+public class ModelManager {
 
     public String createTemplate(String key, String name) {
         BpmnModel model = new BpmnModel();
@@ -41,14 +40,11 @@ public class FlowableModelManager {
     }
 
     public static void main(String[] args) {
-        FlowableModelManager manager = new FlowableModelManager();
+        ModelManager manager = new ModelManager();
         String template = manager.createTemplate("leave", "请假申请");
 
         System.out.printf(template);
     }
-
-
-
 
 
 }

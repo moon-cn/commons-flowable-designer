@@ -2,7 +2,7 @@
 package cn.moon.flowable.designer.controller;
 
 import cn.moon.flowable.designer.domain.FlowModel;
-import cn.moon.flowable.designer.manager.FlowableModelManager;
+import cn.moon.flowable.designer.manager.ModelManager;
 import cn.moon.flowable.designer.tool.BpmnModelXmlTool;
 import cn.moon.lang.json.JsonTool;
 import cn.moon.lang.web.Option;
@@ -50,7 +50,7 @@ public class ModelController {
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
     @Resource
-    private FlowableModelManager flowableModelManager;
+    private ModelManager modelManager;
 
     @GetMapping("list")
     public Result page(String keyword) {
@@ -75,7 +75,7 @@ public class ModelController {
         byte[] source = repositoryService.getModelEditorSource(id);
 
         if (source == null) {
-            String defaultModel = flowableModelManager.createTemplate(model.getKey(), model.getName());
+            String defaultModel = modelManager.createTemplate(model.getKey(), model.getName());
             flowModel.setXml(defaultModel);
         } else {
             flowModel.setXml(new String(source, StandardCharsets.UTF_8));

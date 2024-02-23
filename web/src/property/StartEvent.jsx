@@ -1,10 +1,18 @@
 import React from 'react';
-import {Button, Card, Divider, Form, Input, Modal, Radio, Table} from 'antd';
+import {Button, Card, Form, Input, Select, Space} from 'antd';
 import ModelerUtil from "../utils/ModelerUtil";
-import BaseForm from "./BaseForm";
 import StartEventTimer from "./StartEventTimer";
 import {ArrayTool} from "@crec/lang";
-import {getBusinessObject} from "bpmn-js/lib/util/ModelUtil";
+import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
+
+const typeMap = {
+  text: '文本',
+  long: '整数',
+  double: '小数',
+  date: '日期',
+  boolean: '是否',
+  enum: '枚举'
+}
 
 export default class extends React.Component {
 
@@ -19,14 +27,7 @@ export default class extends React.Component {
     }
 
 
-    return <Card title='表单'>
-      <Form>
-        <Form.Item label='表单标识'>
-          <Input/>
-        </Form.Item>
-      </Form>
-      <StartForm bo={bo}/>
-    </Card>
+    return <StartForm bo={bo}/>
 
   }
 }
@@ -34,30 +35,6 @@ export default class extends React.Component {
 
 class StartForm extends React.Component {
 
-  columns = [
-    {
-      dataIndex: 'id',
-      title: '标识',
-
-    },
-    {
-      dataIndex: 'name',
-      title: '名称',
-
-    },
-
-    {
-      dataIndex: 'type',
-      title: '类型',
-
-    },
-    {
-      dataIndex: 'operation',
-      hideInForm: true,
-      render: (_, record) =>
-        <a onClick={() => this.handleDelete(record)}>删除</a>
-    },
-  ]
 
   state = {
     list: [],
@@ -100,60 +77,67 @@ class StartForm extends React.Component {
 
   formRef = React.createRef()
 
+  onValuesChange = (changed, values) => {
+
+  }
+
   render() {
-    return <div>
+    return <Card title='表单'>
+      <Form onValuesChange={this.onValuesChange}>
+        <Form.Item label='表单标识' name='formKey'>
+          <Input/>
+        </Form.Item>
+      </Form>
+      <div>
 
-      <Button
-        style={{float: 'right'}}
-        onClick={this.handleAdd}
-        size="small"
-        type="primary"
-      >
-        新增
-      </Button>
-      <Table
-        columns={this.columns}
-        dataSource={this.state.list}
-        pagination={false}
-        rowKey='id'
-      >
-      </Table>
+        <div style={{marginBottom: 4}}>表单属性:</div>
 
-      <Modal title='表单属性' open={this.state.formOpen}
-             destroyOnClose
-             onCancel={() => this.setState({formOpen: false})}
-             onOk={() => this.formRef.current.submit()}
-             okText='确定'
-             cancelText='取消'
-      >
+        <Form.List name='formProperties' initialValue={this.state.list}>
+          {(fields, {add, remove}, {errors}) => <>
 
-        <Form ref={this.formRef} layout='horizontal' labelCol={{flex: '100px'}} onFinish={this.onFinish}>
+            {fields.map(({key, name, ...restField}, index) => <Space
+                key={key}
+                style={{
+                  display: 'flex',
+                  marginBottom: 8,
+                }}
+                align="baseline"
+              >
+                <Form.Item label='标识' name={[name, 'id']} {...restField} >
+                  <Input/>
+                </Form.Item>
+                <Form.Item label='名称' name={[name, 'name']} {...restField} >
+                  <Input/>
+                </Form.Item>
 
+                <Form.Item label='类型' name={[name, 'type']} {...restField} >
+                  <Select style={{width: 100}}
+                          options={[{label: '文本', value: 'text'}, {label: '数字', value: 'digit'}]}/>
+                </Form.Item>
+                <MinusCircleOutlined onClick={() => remove(name)}/>
 
-          <Form.Item name='id' label='标识' rules={[{required: true}]}>
-            <Input/>
-          </Form.Item>
+              </Space>
+            )}
 
-          <Form.Item name='name' label='名称' rules={[{required: true}]}>
-            <Input/>
-          </Form.Item>
-          <Form.Item name='valueType' label='类型' rules={[{required: true}]} initialValue='text'>
-            <Radio.Group>
-              <Radio value='text'>文本</Radio>
-              <Radio value='long'>整数</Radio>
-              <Radio value='double'>小数</Radio>
-              <Radio value='date'>日期</Radio>
-              <Radio value='boolean'>是否</Radio>
-              <Radio value='enum'>枚举</Radio>
-            </Radio.Group>
-          </Form.Item>
-
-
-        </Form>
-      </Modal>
+            <Form.Item label=' ' colon={false}>
+              <Button
+                icon={<PlusOutlined/>}
+                type="dashed"
+                onClick={() => add()}
+                style={{
+                  width: '60%',
+                }}
+              >
+                添加参数
+              </Button>
+            </Form.Item>
+          </>
+          }
+        </Form.List>
 
 
-    </div>
+      </div>
+    </Card>
   }
 
 

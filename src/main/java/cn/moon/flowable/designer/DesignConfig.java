@@ -5,8 +5,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan(basePackageClasses = FlowableDesignConfig.class)
-public class FlowableDesignConfig {
+@ComponentScan(basePackageClasses = DesignConfig.class)
+public class DesignConfig {
 
 
 }

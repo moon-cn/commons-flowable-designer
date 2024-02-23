@@ -39,20 +39,7 @@ export default class extends React.Component {
       title: '编码',
       dataIndex: 'key'
     },
-    {
-      title: '表单链接',
-      dataIndex: 'formUrl'
-    },
-    {
-      title: '表单参数',
-      dataIndex: 'conditionVariableList',
-      render(_, record){
-        const list = record.conditionVariableList;
-        if(list && list.length > 0){
-          return list.map(item=><div> {item.label} / {item.name} / {item.valueType} </div>)
-        }
-      }
-    },
+
     {
       title: '更新时间',
       dataIndex: 'updateTime',
@@ -67,7 +54,7 @@ export default class extends React.Component {
       valueType: 'option',
       render: (_, record) => (
         <Space>
-          <a onClick={() => this.props.onChange(record.id)}> 选择 </a>
+          <a onClick={() => this.props.onChange(record.id)}> 选定 </a>
           <a onClick={() => this.handleEdit(record)}> 修改 </a>
           <Popconfirm perm={delPerm} title={'是否确定' + deleteTitle} onConfirm={() => this.handleDelete(record)}>
             <a>删除</a>
@@ -132,7 +119,7 @@ export default class extends React.Component {
         rowKey="id"
       />
 
-      <Modal title='模型基本信息'
+      <Modal title='模型信息'
              open={this.state.formOpen}
              destroyOnClose
              onOk={() => this.formRef.current.submit()}
@@ -148,55 +135,9 @@ export default class extends React.Component {
           <Form.Item label='名称' name='name' rules={[{required: true}]}>
             <Input/>
           </Form.Item>
-          <Form.Item label='编码' name='key' rules={[{required: true}]} help='流程定义的key，全局唯一， 英文'>
+          <Form.Item label='标识Key' name='key' rules={[{required: true}]} help='流程定义的key，全局唯一， 英文'>
             <Input/>
           </Form.Item>
-
-          <Form.Item label='表单地址' name='formUrl' rules={[{required: true}]} help={"支持变量， 如 /user/form?id=${businessKey}"}>
-            <Input/>
-          </Form.Item>
-
-
-          <Form.List label='变量定义' name='conditionVariableList'>
-            {(fields, {add, remove}, {errors}) => <>
-
-              {fields.map(({key, name, ...restField}, index) => <Space
-                  key={key}
-                  style={{
-                    display: 'flex',
-                    marginBottom: 8,
-                  }}
-                  align="baseline"
-                >
-                  <Form.Item label='参数' name={[name, 'name']} {...restField} >
-                    <Input />
-                  </Form.Item>
-                  <Form.Item label='显示' name={[name, 'label']} {...restField} >
-                    <Input/>
-                  </Form.Item>
-                <Form.Item label='类型' name={[name, 'valueType']} {...restField} >
-                  <Select style={{width: 100}} options={[{label:'文本',value:'text'},{label:'数字', value: 'digit'}]}/>
-                </Form.Item>
-                  <MinusCircleOutlined onClick={() => remove(name)}/>
-
-                </Space>
-              )}
-
-              <Form.Item label=' ' colon={false}>
-                <Button
-                  icon={<PlusOutlined/>}
-                  type="dashed"
-                  onClick={() => add()}
-                  style={{
-                    width: '60%',
-                  }}
-                >
-                  添加参数
-                </Button>
-              </Form.Item>
-            </>
-            }
-          </Form.List>
         </Form>
 
       </Modal>

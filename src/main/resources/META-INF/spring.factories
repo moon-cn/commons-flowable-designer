@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-cn.moon.flowable.designer.FlowableDesignConfig
+cn.moon.flowable.designer.DesignConfig
