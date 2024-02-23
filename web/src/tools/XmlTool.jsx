@@ -11,7 +11,7 @@ export default class {
       const xml = res.xml;
       Modal.info({
         icon: null,
-        title: '编辑流程XML文本内容',
+        title: 'XML （可直接编辑）',
         width: 800,
         okText: '确认修改',
         style: {

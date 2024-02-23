@@ -1,5 +1,3 @@
-import {getBusinessObject} from "bpmn-js/lib/util/ModelUtil";
-
 const PREFIX = 'flowable:';
 
 function getPureKey(key) {
@@ -12,6 +10,19 @@ function getFullKey(k) {
 
 export default class {
 
+  static getFullKey = getFullKey
+
+  // 更新属性，会自动加上前缀
+  static updateProperties(modeling, element, properties) {
+    const newProps = {};
+    for (let key in properties) {
+      const fk = getFullKey(key);
+      newProps[fk] = properties[key]
+    }
+
+    modeling.updateProperties(element, newProps)
+
+  }
 
   static getData(bo) {
 
@@ -64,15 +75,5 @@ export default class {
       return JSON.parse(v)
     }
     return []
-  }
-
-  static setForList(bo, key, list) {
-    if(list && list.length){
-      const v = JSON.stringify(list)
-      bo.set(getFullKey(key), v)
-    }else {
-      bo.set(getFullKey(key), undefined)
-    }
-
   }
 }

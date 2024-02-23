@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Card, Col, Collapse, Divider, Empty, Form, message, Modal, Row, Space} from "antd";
+import {Button, Card, Col, Empty, Row} from "antd";
 
 import 'bpmn-js/dist/assets/diagram-js.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
@@ -9,20 +9,12 @@ import BpmnModeler from 'bpmn-js/lib/Modeler'
 import './index.css'
 import customTranslate from "../components/design/customTranslate/customTranslate";
 import contextPad from "../components/design/contextPad";
-import {
-  BranchesOutlined,
-  CloudUploadOutlined,
-  FolderOpenOutlined,
-  FormOutlined,
-  SaveOutlined
-} from "@ant-design/icons";
+import {CloudUploadOutlined, FolderOpenOutlined, SaveOutlined} from "@ant-design/icons";
 import {HttpClient, URLTool} from "@crec/lang";
 import OpenTool from "../tools/OpenTool";
 import XmlTool from "../tools/XmlTool";
 import SaveTool from "../tools/SaveTool";
 import {PropertyPanelMap} from "../property/registry";
-
-const {Panel} = Collapse;
 
 
 export default class extends React.Component {
@@ -98,10 +90,15 @@ export default class extends React.Component {
 
     // 给一个过渡期
     this.setState({
-      elementType: bo.$type.replace("bpmn:", ""),
-      elementName: bo.get('name'),
-      elementId: bo.get('id')
+      elementType: undefined,
+    }, () => {
+      this.setState({
+        elementType: bo.$type.replace("bpmn:", ""),
+        elementName: bo.get('name'),
+        elementId: bo.get('id')
+      })
     })
+
   }
 
   render() {
@@ -126,14 +123,14 @@ export default class extends React.Component {
         </Col>
 
         <Col flex='300px'>
+
           <Card title='通用' extra={this.state.elementType}>
             <div>标识：{this.state.elementId}</div>
             <div>名称：{this.state.elementName}</div>
           </Card>
           <div style={{marginTop: 4}}>
-            {this.renderForm()}
+            {this.state.elementType && this.renderForm()}
           </div>
-
         </Col>
       </Row>
 

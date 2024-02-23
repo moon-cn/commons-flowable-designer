@@ -2,7 +2,6 @@ import React from 'react';
 import {Button, Card, Form, Input, Select, Space} from 'antd';
 import ModelerUtil from "../utils/ModelerUtil";
 import StartEventTimer from "./StartEventTimer";
-import {ArrayTool} from "@crec/lang";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 
 const typeMap = {
@@ -12,6 +11,13 @@ const typeMap = {
   date: '日期',
   boolean: '是否',
   enum: '枚举'
+}
+const typeOptions = []
+for (let k in typeMap) {
+  typeOptions.push({
+    value: k,
+    label: typeMap[k]
+  })
 }
 
 export default class extends React.Component {
@@ -26,93 +32,71 @@ export default class extends React.Component {
       return <StartEventTimer {...childProps}/>
     }
 
-
-    return <StartForm bo={bo}/>
-
+    return <StartForm {...childProps}/>
   }
 }
 
 
 class StartForm extends React.Component {
 
-
-  state = {
-    list: [],
-
-    formOpen: false,
-    formValues: false,
-  }
-
-  componentDidMount() {
-    const bo = this.props.bo;
-    const list = bo.extensionElements.values
-    console.log(list)
-
-    this.setState({list})
-  }
-
-  handleAdd = () => {
-    this.setState({formOpen: true})
-  }
-
-  handleDelete(record) {
-    const {list} = this.state
-    ArrayTool.remove(list, record)
-
-    this.setState({list: [...list]})
-    ModelerUtil.setForList(this.props.bo, 'conditionVariableList', list)
-  }
-
-  onFinish = (values) => {
-    values.$type = "flowable:formProperty"
-    const {list} = this.state
-    let newList = [...list, values];
-
-    this.setState({list: newList, formOpen: false})
-
-
-    this.props.bo.extensionElements.values = list;
-
-  }
-
-  formRef = React.createRef()
-
   onValuesChange = (changed, values) => {
+    const {bo, element, modeling} = this.props
 
+    const {formProperties, formKey} = values;
+
+    if (changed.formKey) {
+      ModelerUtil.updateProperties(modeling,element, {
+         formKey
+      })
+    }
+    if (changed.formProperties) {
+      const $type = "flowable:formProperty"
+
+      var newCondition = moddle.create('bpmn:FormalExpression', {
+        body: '${ value > 100 }'
+      });
+
+      modeling.updateProperties(element, {
+        extensionElements: formProperties
+      });
+    }
   }
+
 
   render() {
+    const bo = this.props.bo;
+    const list = bo.extensionElements.values
+    const data = ModelerUtil.getData(bo)
+
     return <Card title='表单'>
       <Form onValuesChange={this.onValuesChange}>
-        <Form.Item label='表单标识' name='formKey'>
+        <Form.Item label='表单标识' name='formKey' initialValue={data.formKey}>
           <Input/>
         </Form.Item>
-      </Form>
-      <div>
+
 
         <div style={{marginBottom: 4}}>表单属性:</div>
 
-        <Form.List name='formProperties' initialValue={this.state.list}>
+        <Form.List name='formProperties' initialValue={list}>
           {(fields, {add, remove}, {errors}) => <>
 
             {fields.map(({key, name, ...restField}, index) => <Space
                 key={key}
                 style={{
                   display: 'flex',
-                  marginBottom: 8,
                 }}
                 align="baseline"
               >
-                <Form.Item label='标识' name={[name, 'id']} {...restField} >
-                  <Input/>
+                <Form.Item name={[name, 'id']} {...restField} >
+                  <Input placeholder='标识'/>
                 </Form.Item>
-                <Form.Item label='名称' name={[name, 'name']} {...restField} >
-                  <Input/>
+                <Form.Item name={[name, 'name']} {...restField} >
+                  <Input placeholder='名称'/>
                 </Form.Item>
 
-                <Form.Item label='类型' name={[name, 'type']} {...restField} >
-                  <Select style={{width: 100}}
-                          options={[{label: '文本', value: 'text'}, {label: '数字', value: 'digit'}]}/>
+                <Form.Item name={[name, 'type']} {...restField} >
+                  <Select placeholder='类型' style={{width: 60}}
+                          options={typeOptions}/>
                 </Form.Item>
                 <MinusCircleOutlined onClick={() => remove(name)}/>
 
@@ -136,7 +120,7 @@ class StartForm extends React.Component {
         </Form.List>
 
 
-      </div>
+      </Form>
     </Card>
   }
 
