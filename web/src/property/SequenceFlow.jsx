@@ -190,13 +190,17 @@ export default class extends React.Component {
     }))
     return (
       <>
-        <Button type="primary" onClick={this.add} icon={<PlusOutlined/>} style={{marginBottom: 4}} size="small">
-          添加
-        </Button>
+
         <Collapse defaultActiveKey='1'>
           <Collapse.Panel key='1' header='条件'>
-            {this.translate(this.state.expression)}
+            <Button type="dashed" onClick={this.add} icon={<PlusOutlined/>} style={{marginBottom: 4}} size="small">
+              添加
+            </Button>
+            <div>
+              {this.translate(this.state.expression)}
+            </div>
           </Collapse.Panel>
+
           <Collapse.Panel key='2' header='高级编辑'
                           extra={<Popover
                             content="EL表达式，如 ${age > 10 && name.contains('张三')}">
