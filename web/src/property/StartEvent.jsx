@@ -76,7 +76,7 @@ class StartForm extends React.Component {
     const data = ModelerUtil.getData(bo)
 
     return <Card title='表单'>
-      <Form onValuesChange={this.onValuesChange}>
+      <Form onValuesChange={this.onValuesChange} size="small">
         <Form.Item label='表单标识' name='formKey' initialValue={data.formKey}>
           <Input/>
         </Form.Item>
@@ -114,6 +114,7 @@ class StartForm extends React.Component {
               <Button
                 icon={<PlusOutlined/>}
                 type="dashed"
+                size="small"
                 onClick={() => add()}
                 style={{
                   width: '60%',
