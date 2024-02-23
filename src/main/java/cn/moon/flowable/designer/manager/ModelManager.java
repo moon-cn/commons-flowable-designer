@@ -27,14 +27,6 @@ public class ModelManager {
 
         model.addGraphicInfo(startEvent.getId(), new GraphicInfo(200, 200, 30, 30));
 
-        startEvent.setFormKey("1");
-        ArrayList<FormProperty> formProperties = new ArrayList<>();
-        FormProperty formProperty = new FormProperty();
-        formProperty.setName("请假天数");
-        formProperty.setRequired(true);
-        formProperty.setId("days");
-        formProperties.add(formProperty);
-        startEvent.setFormProperties(formProperties);
 
         return BpmnModelXmlTool.modelToXml(model);
     }
