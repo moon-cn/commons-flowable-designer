@@ -1,4 +1,3 @@
-
 const PREFIX = 'flowable:';
 
 function getPureKey(key) {
@@ -24,6 +23,7 @@ export default class {
     modeling.updateProperties(element, newProps)
 
   }
+
 
   static getData(bo) {
 
@@ -76,5 +76,14 @@ export default class {
       return JSON.parse(v)
     }
     return []
+  }
+
+  static query(root, type) {
+    const elements = root.flowElements;
+    for (const element of elements) {
+      if (element.$type === type) {
+        return element;
+      }
+    }
   }
 }

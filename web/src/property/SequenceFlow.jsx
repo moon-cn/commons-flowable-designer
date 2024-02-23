@@ -50,8 +50,15 @@ export default class extends React.Component {
 
   componentDidMount() {
     const rootBo = getBusinessObject(this.props.root)
-    const conditionVariableList = ModelerUtil.getForList(rootBo, 'conditionVariableList');
-    this.setState({conditionVariableList})
+    const startBo = ModelerUtil.query(rootBo,'bpmn:StartEvent');
+
+
+    const conditionVariableList = startBo.extensionElements.get('values').map(v=>{
+      return {
+        id:v.id, name:v.name
+      }
+    })
+      this.setState({conditionVariableList})
     this.refresh()
   }
 
@@ -122,6 +129,9 @@ export default class extends React.Component {
   }
 
   translate = expression => {
+    if(expression == null){
+      return expression
+    }
     const translation = {
       '&&': '且',
       '||': '或者',
