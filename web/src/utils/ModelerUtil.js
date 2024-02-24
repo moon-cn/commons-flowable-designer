@@ -10,7 +10,6 @@ function getFullKey(k) {
 
 export default class {
 
-  static getFullKey = getFullKey
 
   // 更新属性，会自动加上前缀
   static updateProperties(modeling, element, properties) {
@@ -69,15 +68,6 @@ export default class {
       definitions[0].$type === "bpmn:TimerEventDefinition"
     )
   }
-
-  static getForList(bo, key) {
-    const v = bo.get(getFullKey(key))
-    if (v) {
-      return JSON.parse(v)
-    }
-    return []
-  }
-
   static query(root, type) {
     const elements = root.flowElements;
     for (const element of elements) {

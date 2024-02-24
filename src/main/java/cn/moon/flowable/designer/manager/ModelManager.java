@@ -5,13 +5,18 @@ import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-
 
 @Component
 public class ModelManager {
 
     public String createTemplate(String key, String name) {
+        BpmnModel model = createTemplateModel(key, name);
+
+
+        return BpmnModelXmlTool.modelToXml(model);
+    }
+
+    public  BpmnModel createTemplateModel(String key, String name) {
         BpmnModel model = new BpmnModel();
 
         Process proc = new Process();
@@ -26,9 +31,7 @@ public class ModelManager {
         proc.addFlowElement(startEvent);
 
         model.addGraphicInfo(startEvent.getId(), new GraphicInfo(200, 200, 30, 30));
-
-
-        return BpmnModelXmlTool.modelToXml(model);
+        return model;
     }
 
 
