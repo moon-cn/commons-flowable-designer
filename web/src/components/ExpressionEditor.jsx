@@ -1,6 +1,6 @@
 import React from "react";
 import {Button, Empty, Form, Input, Modal, Select, Tag} from "antd";
-import {CheckOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
+import {CheckOutlined, DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import jsep from '../libs/jsep.min'
 import {render} from "react-dom";
 
@@ -31,6 +31,53 @@ const opsOptions = Object.keys(ops).map(k => ({
   label: ops[k],
   value: k
 }))
+
+function isSimple(type){
+  return type === "Identifier" || type === "Literal";
+}
+function toStr(block) {
+  if (block == null) {
+    return block
+  }
+
+  let {type, left, operator, right, name, raw} = block
+
+  if (type === 'CallExpression') {
+    let {arguments: args, callee} = block
+    return toStr(callee.object) + toStr(callee.property) + args.map(arg=>toStr(arg)).join(',')
+  }
+
+  if (block.type === "Identifier") {
+    return name
+  }
+  if (block.type === "Literal") {
+    return raw
+  }
+
+  const str = toStr(left)  + operator + toStr(right)
+
+  if(operator === '||' || operator === '&&' ){
+    return  '(' + str + ')'
+  }
+  return str
+}
+
+function simply(expression){
+  if(expression == null){
+    return expression
+  }
+
+
+  if(expression.startsWith('(')){
+    expression = expression.substring(1, expression.length -1)
+  }
+
+
+
+  return  expression;
+
+}
+
 export default class extends React.Component {
 
   state = {
@@ -45,7 +92,7 @@ export default class extends React.Component {
 
   manualEdit = () => {
     const value = prompt('手动编辑表达式', this.props.value)
-    if(value){
+    if (value) {
       this.props.onChange(value)
 
     }
@@ -59,16 +106,17 @@ export default class extends React.Component {
   render() {
     const {value, onChange, variables = []} = this.props
 
+
     let parsed = null
     try {
-      if(value){
+      if (value) {
         parsed = jsep(value)
       }
     } catch (e) {
-      return <Empty description='解析异常'>
-        {value}
-      </Empty>
+      console.error(e)
     }
+
+    console.log('解析结果',parsed)
 
     const conditionVariableOptions = variables.map(item => ({
       value: item.id,
@@ -76,7 +124,13 @@ export default class extends React.Component {
     }))
     return <div>
 
-      <div style={{marginBottom: 4}}>
+
+      {parsed && this.renderExpression(parsed)}
+
+      <div> 原始：{value}   </div>
+      <div> 解析： {simply(toStr(parsed))}  </div>
+
+      <div style={{margin: 4}}>
         <Button type="dashed" onClick={this.add} icon={<PlusOutlined/>} size="small">
           添加
         </Button>
@@ -84,9 +138,6 @@ export default class extends React.Component {
           手动编辑
         </Button>
       </div>
-
-
-      {parsed && this.renderExpression(parsed)}
 
       <Modal open={this.state.formOpen} title="添加条件"
              onOk={() => this.formRef.current.submit()}
@@ -166,7 +217,14 @@ export default class extends React.Component {
       <div>{this.renderExpression(left)}</div>
       <Tag color='red'>{operatorLabel || operator}</Tag>
       <div>{this.renderExpression(right)}</div>
+
+      <Button size='small' icon={<DeleteOutlined/>} type='text' onClick={() => this.deleteBlock(parsed)}></Button>
     </div>
   };
+
+  deleteBlock = (block) => {
+
+
+  }
 
 }
