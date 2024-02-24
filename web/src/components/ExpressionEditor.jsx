@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Empty, Form, Input, Modal, Select, Tag} from "antd";
+import {Button, Card, Empty, Form, Input, Modal, Select, Tag} from "antd";
 import {CheckOutlined, DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
 import jsep from '../libs/jsep.min'
 import {render} from "react-dom";
@@ -128,7 +128,6 @@ export default class extends React.Component {
       {parsed && this.renderExpression(parsed)}
 
       <div> 原始：{value}   </div>
-      <div> 解析： {simply(toStr(parsed))}  </div>
 
       <div style={{margin: 4}}>
         <Button type="dashed" onClick={this.add} icon={<PlusOutlined/>} size="small">
@@ -218,13 +217,8 @@ export default class extends React.Component {
       <Tag color='red'>{operatorLabel || operator}</Tag>
       <div>{this.renderExpression(right)}</div>
 
-      <Button size='small' icon={<DeleteOutlined/>} type='text' onClick={() => this.deleteBlock(parsed)}></Button>
     </div>
   };
 
-  deleteBlock = (block) => {
-
-
-  }
 
 }

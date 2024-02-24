@@ -5,6 +5,8 @@ import cn.moon.flowable.designer.tool.BpmnModelXmlTool;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class XmlFactory {
 
