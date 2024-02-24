@@ -31,12 +31,5 @@ public class ModelManager {
         return BpmnModelXmlTool.modelToXml(model);
     }
 
-    public static void main(String[] args) {
-        ModelManager manager = new ModelManager();
-        String template = manager.createTemplate("leave", "请假申请");
-
-        System.out.printf(template);
-    }
-
 
 }
