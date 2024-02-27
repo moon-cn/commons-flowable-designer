@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.moon-cn</groupId>
     <artifactId>commons-flowable-designer</artifactId>
-    <version>1.0.0</version>
+    <version>0.0.1</version>
     <description>simple flowable designer</description>
     <url>https://github.com/moon-cn/commons-flowable-designer</url>
     <licenses>
@@ -36,7 +36,6 @@
         <compile.version>8</compile.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>utf-8</project.reporting.outputEncoding>
-        <gpg.passphrase>19491001</gpg.passphrase>
     </properties>
 
 

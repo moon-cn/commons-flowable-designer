@@ -40,3 +40,4 @@ build/
 /web/node_modules/
 /web/package-lock.json
 /web/src/.umi/
+/web/src/.umi-production/
