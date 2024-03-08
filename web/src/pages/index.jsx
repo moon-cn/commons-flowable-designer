@@ -14,7 +14,7 @@ import {HttpClient, URLTool} from "@crec/lang";
 import OpenTool from "../tools/OpenTool";
 import XmlTool from "../tools/XmlTool";
 import SaveTool from "../tools/SaveTool";
-import {PropertyPanelMap} from "../property/registry";
+import {PropertyPanelMap} from "../propertyPanel/registry";
 import flowableDesc from '../resources/flowable.json'
 
 export default class extends React.Component {

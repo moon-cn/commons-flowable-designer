@@ -1,12 +1,15 @@
 import React from "react";
-import {Button, Card, Empty, Form, Input, Modal, Select, Tag} from "antd";
-import {CheckOutlined, DeleteOutlined, EditOutlined, PlusOutlined} from "@ant-design/icons";
+import {Button, Form, Input, Modal, Select, Tag} from "antd";
+import {EditOutlined, PlusOutlined} from "@ant-design/icons";
 import jsep from '../libs/jsep.min'
-import {render} from "react-dom";
 
 
 /**
- * 条件表达式编辑器
+ * 独立的条件表达式编辑器
+ *
+ * 1. 解析条件表达式
+ * 2. 设置条件表达式
+ *
  */
 
 const fns = {
@@ -99,7 +102,7 @@ export default class extends React.Component {
   }
 
   onFormFinish = (values) => {
-
+    this.props.onChange(value)
   }
 
 
@@ -123,12 +126,7 @@ export default class extends React.Component {
       label: item.name + " ( " + item.id + " )"
     }))
     return <div>
-
-
       {parsed && this.renderExpression(parsed)}
-
-      <div> 原始：{value}   </div>
-
       <div style={{margin: 4}}>
         <Button type="dashed" onClick={this.add} icon={<PlusOutlined/>} size="small">
           添加
