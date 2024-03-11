@@ -1,6 +1,7 @@
 import React from "react";
-import {Button, Divider, Input, Space, Tag} from "antd";
+import {Button, Col, Empty, Input, Row, Tabs, Tag} from "antd";
 import {parseToArr} from "../tools/ExpressionTokenParser";
+import {Divider} from "antd/es";
 
 
 /**
@@ -130,50 +131,69 @@ export default class extends React.Component {
   onInput = (v) => {
     const arr = parseToArr(this.props.value)
     arr.push(v)
-   this.props.onChange(arr.join(''))
+    this.props.onChange(arr.join(''))
   }
 
   render() {
-    const {value, onChange, variables = []} = this.props
+    const {value, variables = []} = this.props
 
     return <>
-      <fieldset>
-        <legend>条件 <a style={{fontSize: 'small'}} onClick={this.manualEdit}>手动编辑</a></legend>
-        {this.translate(value, variables)}
-      </fieldset>
-      <Divider />
-      <div>
-        <Space wrap={true}>
-          {variables.map(v => <Button size='small' onClick={() => this.onInput(v.id)}>{v.name}</Button>)}
-        </Space>
-      </div>
-      <div style={{marginTop: 8}}>
-        <Space wrap={true}>
-          {opsOptions.map(v => <Button size='small' onClick={() => this.onInput(v.value)}>{v.label}</Button>)}
-        </Space>
-      </div>
-      <div style={{marginTop: 8}}>
-        <Space>
-          {defaultValueOptions.map(v => <Button size='small' onClick={() => this.onInput(v.value)}>{v.label}</Button>)}
-          <Input.Group compact>
-            <Input size='small' placle='输入值' style={{width: 'calc(100% - 50px)'}} value={this.state.valueInputValue}
-                   onChange={e => {
-                     this.setState({valueInputValue: e.target.value})
-                   }}/>
-            <Button size='small' onClick={() => {
-              this.onInput(this.state.valueInputValue);
-              this.setState({valueInputValue: null})
-            }}>确定</Button>
-          </Input.Group>
+      {this.translate(value, variables)}
 
-        </Space>
-      </div>
+      <Divider/>
 
-      <div style={{marginTop: 8, marginBottom: 8}}>
-        <Space>
-          {logicOptions.map(v => <Button size='small' onClick={() => this.onInput(v.value)}>{v.label}</Button>)}
-        </Space>
-      </div>
+      <Tabs destroyInactiveTabPane
+            items={[
+              {
+                label: '默认编辑器', key: 'default', children: <Row wrap={false} gutter={8}>
+                  <Col span={8}>
+                    <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+                      {variables.map(v => <Button size='small' onClick={() => this.onInput(v.id)}>{v.name}</Button>)}
+
+
+                      {logicOptions.map(v => <Button size='small'
+                                                     onClick={() => this.onInput(v.value)}>{v.label}</Button>)}
+                    </div>
+                  </Col>
+                  <Col span={8}>
+                    <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+                      {opsOptions.map(v => <Button size='small'
+                                                   onClick={() => this.onInput(v.value)}>{v.label}</Button>)}
+                    </div>
+                  </Col>
+                  <Col span={8}>
+                    <div style={{display: 'flex', flexDirection: 'column', gap: 4}}>
+                      <Input.Group compact>
+                        <Input size='small' placeholder='输入值'
+                               value={this.state.valueInputValue}
+                               onChange={e => {
+                                 this.setState({valueInputValue: e.target.value})
+                               }}/>
+                        <Button size='small' onClick={() => {
+                          this.onInput(this.state.valueInputValue);
+                          this.setState({valueInputValue: null})
+                        }}>确定</Button>
+                      </Input.Group>
+
+                      {defaultValueOptions.map(v => <Button
+                        size='small'
+                        onClick={() => this.onInput(v.value)}>{v.label}</Button>)}
+                    </div>
+                  </Col>
+
+
+                </Row>
+              },
+              {
+                label: '手动编辑',
+                key: 'manual',
+                children: <a style={{fontSize: 'small'}} onClick={this.manualEdit}>手动编辑</a>
+              }
+            ]}>
+
+      </Tabs>
+
+
     </>
   }
 
@@ -181,10 +201,14 @@ export default class extends React.Component {
   translate(value, variables) {
     const arr = parseToArr(value)
 
+    if (arr.length === 0) {
+      return <Empty description='未设置条件'></Empty>
+    }
+
     return arr.map(item => {
       let rs = variables.find(v => v.id === item)
       if (rs !== undefined) {
-        return <Tag color='blue'> {rs.name}</Tag>
+        return <Tag color='blue' closable={true}> {rs.name}</Tag>
       }
       rs = opsOptions.find(v => v.value === item)
       if (rs !== undefined) {
@@ -200,7 +224,7 @@ export default class extends React.Component {
         return <Tag color='green'> {rs.label}</Tag>
       }
 
-      return <Tag color='green'>{item}</Tag> ;
+      return <Tag color='green'>{item}</Tag>;
     });
   }
 }

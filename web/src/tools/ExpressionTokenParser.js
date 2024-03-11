@@ -4,6 +4,9 @@ const STR_FLAGS = ['"', '\''];
 
 
 export function parseToArr(str){
+  if(str == null){
+    return []
+  }
   const arr = [];
   splitWords(str, arr)
   return arr;
