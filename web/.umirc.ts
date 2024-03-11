@@ -53,5 +53,5 @@ export default defineConfig({
    * 渲染和 url 解绑，html 文件放哪都能使用
    */
   mpa:{},
-  outputPath:"../crec-flowable/src/main/resources/static/flowable"
+  outputPath:"../src/main/resources/static/flowable"
 });
