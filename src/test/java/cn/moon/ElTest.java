@@ -75,7 +75,7 @@ public class ElTest {
     @Test
     public  void testBad() {
         ExpressionManager expressionManager = new ProcessExpressionManager(null);
-        Expression expression = expressionManager.createExpression("${reason == 1Y}");
+        Expression expression = expressionManager.createExpression("${reason == 1}");
 
         DelegateExecution delegateExecution = new ExecutionEntityImpl();
         Map<String, Object> data = new HashMap<>();
