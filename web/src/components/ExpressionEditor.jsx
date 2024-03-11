@@ -1,5 +1,6 @@
 import React from "react";
-import {Button, Card, Input, Space} from "antd";
+import {Button, Divider, Input, Space, Tag} from "antd";
+import {parseToArr} from "../tools/ExpressionTokenParser";
 
 
 /**
@@ -88,12 +89,10 @@ export default class extends React.Component {
     valueInputValue: undefined,
 
     arrValue: [],
-
-
   }
 
   componentDidMount() {
-    const {value, onChange, variables = []} = this.props
+    const {variables = []} = this.props
 
     const conditionVariableOptions = variables.map(item => ({
       value: item.id,
@@ -121,6 +120,7 @@ export default class extends React.Component {
 
     this.setState({options, defaultOptions: options})
   }
+
   manualEdit = () => {
     const value = prompt('手动编辑表达式', this.props.value)
     if (value) {
@@ -128,45 +128,38 @@ export default class extends React.Component {
     }
   }
   onInput = (v) => {
-    const arrValue = this.state.arrValue
-    arrValue.push(v)
-    this.setState({arrValue})
+    const arr = parseToArr(this.props.value)
+    arr.push(v)
+   this.props.onChange(arr.join(''))
   }
 
   render() {
     const {value, onChange, variables = []} = this.props
 
-
-    return <Card>
+    return <>
       <fieldset>
-        <legend>条件 <a style={{fontSize:'small'}} onClick={this.manualEdit}>手动编辑</a></legend>
-        <Input.TextArea disabled={true} value={this.translate(variables)} placeholder='请编辑表达式'/>
-        <div>{value}</div>
+        <legend>条件 <a style={{fontSize: 'small'}} onClick={this.manualEdit}>手动编辑</a></legend>
+        {this.translate(value, variables)}
       </fieldset>
-
-
-      <fieldset>
-        <legend>
-          变量
-        </legend>
+      <Divider />
+      <div>
         <Space wrap={true}>
           {variables.map(v => <Button size='small' onClick={() => this.onInput(v.id)}>{v.name}</Button>)}
         </Space>
-      </fieldset>
-      <fieldset style={{marginTop: 8}}>
-        <legend>操作</legend>
+      </div>
+      <div style={{marginTop: 8}}>
         <Space wrap={true}>
           {opsOptions.map(v => <Button size='small' onClick={() => this.onInput(v.value)}>{v.label}</Button>)}
         </Space>
-      </fieldset>
-      <fieldset style={{marginTop: 8}}>
-       <legend> 值</legend>
+      </div>
+      <div style={{marginTop: 8}}>
         <Space>
           {defaultValueOptions.map(v => <Button size='small' onClick={() => this.onInput(v.value)}>{v.label}</Button>)}
           <Input.Group compact>
-            <Input size='small' placle='输入值' style={{ width: 'calc(100% - 50px)' }} value={this.state.valueInputValue} onChange={e=>{
-              this.setState({valueInputValue: e.target.value})
-            }}/>
+            <Input size='small' placle='输入值' style={{width: 'calc(100% - 50px)'}} value={this.state.valueInputValue}
+                   onChange={e => {
+                     this.setState({valueInputValue: e.target.value})
+                   }}/>
             <Button size='small' onClick={() => {
               this.onInput(this.state.valueInputValue);
               this.setState({valueInputValue: null})
@@ -174,42 +167,40 @@ export default class extends React.Component {
           </Input.Group>
 
         </Space>
-      </fieldset>
+      </div>
 
-      <fieldset style={{marginTop: 8, marginBottom: 8}}>
-        <legend>
-          逻辑
-        </legend>
-
+      <div style={{marginTop: 8, marginBottom: 8}}>
         <Space>
           {logicOptions.map(v => <Button size='small' onClick={() => this.onInput(v.value)}>{v.label}</Button>)}
         </Space>
-      </fieldset>
-    </Card>
+      </div>
+    </>
   }
 
 
-  translate(variables) {
-    return this.state.arrValue.map(a => {
-      let rs = variables.find(v => v.id === a)
+  translate(value, variables) {
+    const arr = parseToArr(value)
+
+    return arr.map(item => {
+      let rs = variables.find(v => v.id === item)
       if (rs !== undefined) {
-        return rs.name
+        return <Tag color='blue'> {rs.name}</Tag>
       }
-      rs = opsOptions.find(v => v.value === a)
+      rs = opsOptions.find(v => v.value === item)
       if (rs !== undefined) {
-        return rs.label
+        return <Tag color='warning'> {rs.label}</Tag>
       }
-      rs = logicOptions.find(v => v.value === a)
+      rs = logicOptions.find(v => v.value === item)
       if (rs !== undefined) {
-        return rs.label
+        return <Tag color='warning'> {rs.label}</Tag>
       }
 
-      rs = defaultValueOptions.find(v => v.value === a)
+      rs = defaultValueOptions.find(v => v.value === item)
       if (rs !== undefined) {
-        return rs.label
+        return <Tag color='green'> {rs.label}</Tag>
       }
 
-      return a;
-    }).join(' ');
+      return <Tag color='green'>{item}</Tag> ;
+    });
   }
 }
