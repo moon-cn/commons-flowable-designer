@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Card, Col, Collapse, Divider, Empty, Form, message, Modal, Row, Space} from "antd";
+import {Button, Card, Col, Empty, Row} from "antd";
 
 import 'bpmn-js/dist/assets/diagram-js.css'
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
@@ -9,23 +9,13 @@ import BpmnModeler from 'bpmn-js/lib/Modeler'
 import './index.css'
 import customTranslate from "../components/design/customTranslate/customTranslate";
 import contextPad from "../components/design/contextPad";
-import {
-  BranchesOutlined,
-  CloudUploadOutlined,
-  FolderOpenOutlined,
-  FormOutlined,
-  SaveOutlined
-} from "@ant-design/icons";
+import {CloudUploadOutlined, FolderOpenOutlined, SaveOutlined} from "@ant-design/icons";
 import {HttpClient, URLTool} from "@crec/lang";
 import OpenTool from "../tools/OpenTool";
 import XmlTool from "../tools/XmlTool";
 import SaveTool from "../tools/SaveTool";
-import {PropertyPanelMap} from "../property/registry";
-import ModelerUtil from "../utils/ModelerUtil";
-import ConditionVariableTool from "../tools/ConditionVariableTool";
-
-const {Panel} = Collapse;
-
+import {PropertyPanelMap} from "../propertyPanel/registry";
+import flowableDesc from '../resources/flowable.json'
 
 export default class extends React.Component {
 
@@ -39,7 +29,6 @@ export default class extends React.Component {
     elementId: null,
   }
 
-  curBo = null
   element = null
 
   componentDidMount() {
@@ -47,27 +36,29 @@ export default class extends React.Component {
     const id = params.id
 
 
-    window._bpmnModeler = this.bpmnModeler = new BpmnModeler({
+    const bpmnModeler = window._bpmnModeler = this.bpmnModeler = new BpmnModeler({
       additionalModules: [
         // 汉化翻译
         {
           translate: ['value', customTranslate]
         },
         contextPad,
-      ]
+      ],
+      moddleExtensions:{
+        flowable: flowableDesc
+      }
     });
 
 
     window._modeling = this.modeling = this.bpmnModeler.get('modeling'); // 建模， 包含很多方法
     window._moddle = this.moddle = this.bpmnModeler.get('moddle'); // 数据模型， 主要存储元数据
 
+
     if (!id) {
       OpenTool.open()
     } else {
       this.initById(id)
     }
-
-
   }
 
   initById = id => {
@@ -100,10 +91,15 @@ export default class extends React.Component {
 
     // 给一个过渡期
     this.setState({
-      elementType: bo.$type.replace("bpmn:", ""),
-      elementName: bo.get('name'),
-      elementId: bo.get('id')
+      elementType: undefined,
+    }, () => {
+      this.setState({
+        elementType: bo.$type.replace("bpmn:", ""),
+        elementName: bo.get('name'),
+        elementId: bo.get('id')
+      })
     })
+
   }
 
   render() {
@@ -116,9 +112,6 @@ export default class extends React.Component {
 
           <Button icon={<SaveOutlined/>} onClick={() => SaveTool.onSaveXml(this.bpmnModeler)}>保存</Button>
           <Button icon={<CloudUploadOutlined/>} onClick={() => SaveTool.onDeploy(this.bpmnModeler)}>部署</Button>
-          <Button icon={<BranchesOutlined/>}
-                  onClick={() => ConditionVariableTool.open(this.bpmnModeler)}>条件变量</Button>
-          <Button icon={<FormOutlined/>}>表单</Button>
           <Button onClick={() => XmlTool.onClick(this.bpmnModeler)}>XML</Button>
         </div>
         <span>
@@ -131,16 +124,14 @@ export default class extends React.Component {
         </Col>
 
         <Col flex='300px'>
-          <Card title='基本信息' extra={this.state.elementType}>
+
+          <Card title='通用' extra={this.state.elementType}>
             <div>标识：{this.state.elementId}</div>
             <div>名称：{this.state.elementName}</div>
           </Card>
-          <Card title='设置' style={{marginTop: 4}}>
-
-            {this.renderForm()}
-
-          </Card>
-
+          <div style={{marginTop: 4}}>
+            {this.state.elementType && this.renderForm()}
+          </div>
         </Col>
       </Row>
 

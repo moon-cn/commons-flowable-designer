@@ -1,17 +1,22 @@
 package cn.moon.flowable.designer.manager;
 
 import cn.moon.flowable.designer.tool.BpmnModelXmlTool;
-import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
-import org.flowable.bpmn.model.StartEvent;
 import org.springframework.stereotype.Component;
 
 
 @Component
-public class FlowableModelManager {
+public class ModelManager {
 
     public String createTemplate(String key, String name) {
+        BpmnModel model = createTemplateModel(key, name);
+
+
+        return BpmnModelXmlTool.modelToXml(model);
+    }
+
+    public  BpmnModel createTemplateModel(String key, String name) {
         BpmnModel model = new BpmnModel();
 
         Process proc = new Process();
@@ -26,7 +31,8 @@ public class FlowableModelManager {
         proc.addFlowElement(startEvent);
 
         model.addGraphicInfo(startEvent.getId(), new GraphicInfo(200, 200, 30, 30));
-
-        return BpmnModelXmlTool.modelToXml(model);
+        return model;
     }
+
+
 }

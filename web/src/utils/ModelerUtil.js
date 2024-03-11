@@ -1,5 +1,3 @@
-import {getBusinessObject} from "bpmn-js/lib/util/ModelUtil";
-
 const PREFIX = 'flowable:';
 
 function getPureKey(key) {
@@ -11,6 +9,19 @@ function getFullKey(k) {
 }
 
 export default class {
+
+
+  // 更新属性，会自动加上前缀
+  static updateProperties(modeling, element, properties) {
+    const newProps = {};
+    for (let key in properties) {
+      const fk = getFullKey(key);
+      newProps[fk] = properties[key]
+    }
+
+    modeling.updateProperties(element, newProps)
+
+  }
 
 
   static getData(bo) {
@@ -57,22 +68,12 @@ export default class {
       definitions[0].$type === "bpmn:TimerEventDefinition"
     )
   }
-
-  static getForList(bo, key) {
-    const v = bo.get(getFullKey(key))
-    if (v) {
-      return JSON.parse(v)
+  static query(root, type) {
+    const elements = root.flowElements;
+    for (const element of elements) {
+      if (element.$type === type) {
+        return element;
+      }
     }
-    return []
-  }
-
-  static setForList(bo, key, list) {
-    if(list && list.length){
-      const v = JSON.stringify(list)
-      bo.set(getFullKey(key), v)
-    }else {
-      bo.set(getFullKey(key), undefined)
-    }
-
   }
 }
