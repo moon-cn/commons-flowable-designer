@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@ant-design/icons": "^4.0.0",
-    "@ant-design/pro-components": "^2.0.0",
     "@crec/lang": "^1.0.0-beta.10",
     "antd": "^4.0.0",
     "axios": "^1.6.7",

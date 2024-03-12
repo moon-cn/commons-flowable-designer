@@ -1,164 +1,159 @@
-import React from "react";
-import {Button, Card, Col, Empty, Row} from "antd";
+import {Button, Form, Input, message, Modal, Popconfirm, Space, Table} from 'antd';
+import React from 'react';
+import {PlusOutlined} from "@ant-design/icons";
+import {HttpClient} from "@crec/lang";
 
-import 'bpmn-js/dist/assets/diagram-js.css'
-import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
-import {getBusinessObject} from "bpmn-js/lib/util/ModelUtil";
-import BpmnModeler from 'bpmn-js/lib/Modeler'
+const baseTitle = "流程模型";
+const baseApi = 'flowable/model/';
+const basePerm = 'flowable/model:';
 
-import './index.css'
-import customTranslate from "../components/design/customTranslate/customTranslate";
-import contextPad from "../components/design/contextPad";
-import {CloudUploadOutlined, FolderOpenOutlined, SaveOutlined} from "@ant-design/icons";
-import {HttpClient, URLTool} from "@crec/lang";
-import OpenTool from "../tools/OpenTool";
-import XmlTool from "../tools/XmlTool";
-import SaveTool from "../tools/SaveTool";
-import {PropertyPanelMap} from "../propertyPanel/registry";
-import flowableDesc from '../resources/flowable.json'
+const deleteTitle = '删除' + baseTitle
+
+
+const delApi = baseApi + 'delete'
+const pageApi = baseApi + 'list'
+
+const delPerm = basePerm + 'delete'
+
 
 export default class extends React.Component {
 
 
   state = {
-    model: null,
-
-    elementType: null,
-    elementName: '',
-    elementId: null,
+    formValues: {},
+    formOpen:false,
+    list:[]
   }
 
-  element = null
+  actionRef = React.createRef();
+  formRef = React.createRef();
+
+
+  columns = [
+    {
+      title: '名称',
+      dataIndex: 'name',
+      sorter: true,
+      render:(_, record)=>{
+        return <a href={this.getDesignUrl(record)}>{record.name}</a>
+      }
+    },
+    {
+      title: '编码',
+      dataIndex: 'key'
+    },
+
+    {
+      title: '更新时间',
+      dataIndex: 'updateTime',
+      hideInForm: true,
+      hideInSearch: true
+    },
+
+
+    {
+      title: '操作',
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_, record) => (
+        <Space>
+          <a href={this.getDesignUrl(record)}> 设计 </a>
+          <a onClick={() => this.handleEdit(record)}> 修改 </a>
+          <Popconfirm perm={delPerm} title={'是否确定' + deleteTitle} onConfirm={() => this.handleDelete(record)}>
+            <a>删除</a>
+          </Popconfirm>
+
+        </Space>
+      ),
+    },
+  ];
+
+  getDesignUrl = record => {
+    let location = 'design.html?id=' + record.id;
+    return location
+  };
 
   componentDidMount() {
-    let params = URLTool.params();
-    const id = params.id
-
-
-    const bpmnModeler = window._bpmnModeler = this.bpmnModeler = new BpmnModeler({
-      additionalModules: [
-        // 汉化翻译
-        {
-          translate: ['value', customTranslate]
-        },
-        contextPad,
-      ],
-      moddleExtensions:{
-        flowable: flowableDesc
-      }
-    });
-
-
-    window._modeling = this.modeling = this.bpmnModeler.get('modeling'); // 建模， 包含很多方法
-    window._moddle = this.moddle = this.bpmnModeler.get('moddle'); // 数据模型， 主要存储元数据
-
-
-    if (!id) {
-      OpenTool.open()
-    } else {
-      this.initById(id)
-    }
+    this.request()
   }
 
-  initById = id => {
-    if (id) {
-      this.setState({id})
-      HttpClient.get('flowable/model/detail', {id}).then(rs => {
-        this.setState({model: rs.data})
-        this.initBpmn(rs.data.xml)
-      })
-    }
-
-  };
-
-  initBpmn = xml => {
-    const id = '#flow-canvas-' + this.state.id
-    this.bpmnModeler.attachTo(id);
-    this.bpmnModeler.importXML(xml)
-    console.log(xml)
-
-    this.bpmnModeler.on('element.contextmenu', e => e.preventDefault()) // 关闭右键，影响操作
-    this.bpmnModeler.on('selection.changed', this.onSelectionChanged);
-  };
-
-
-  onSelectionChanged = e => {
-    const {newSelection} = e;
-    let definitions = this.bpmnModeler.getDefinitions();
-    if(definitions.rootElements == null){
-      return
-    }
-    const root = this.root = definitions.rootElements[0]
-    const element = this.element = newSelection[0] || root
-    const bo = window._bo = this.bo = getBusinessObject(element)
-
-
-    // 给一个过渡期
-    this.setState({
-      elementType: undefined,
-    }, () => {
-      this.setState({
-        elementType: bo.$type.replace("bpmn:", ""),
-        elementName: bo.get('name'),
-        elementId: bo.get('id')
-      })
+  request = (keyword)=>{
+    HttpClient.get(pageApi,{keyword}).then(rs=>{
+      this.setState({list:rs.data})
     })
-
   }
+
+
+
+  handleAdd = () => {
+    this.setState({
+      formOpen:true,
+      formValues:{}
+    })
+  }
+
+  handleEdit = record=>{
+    this.setState({
+      formOpen:true,
+      formValues:record
+    })
+  }
+  onFinish = values=>{
+    HttpClient.post('flowable/model/save',values).then(rs=>{
+      message.success(rs.message)
+      this.request()
+      this.setState({formOpen:false})
+    })
+  }
+
+  handleDelete = row => {
+    HttpClient.get(delApi, {id:row.id}).then(rs => {
+      rs.success ? message.success(rs.message) : message.error(rs.message)
+      this.request()
+    })
+  }
+
 
   render() {
+    return <div style={{padding:12}}>
+      <div style={{marginBottom: 12, display:'flex', justifyContent:'space-between'}}>
+        <Input.Search style={{width: 180, }} onSearch={(e)=>this.request(e)} />
+        <Button icon={<PlusOutlined/>} type='primary' onClick={this.handleAdd}>新建</Button>
+      </div>
+      <Table
+        dataSource={this.state.list}
+        actionRef={this.actionRef}
+        columns={this.columns}
+        rowKey="id"
+      />
 
-    return <div style={{background: '#f5f5f5'}}>
-      <section style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-        <div>
-          <Button icon={<FolderOpenOutlined/>}
-                  onClick={() => OpenTool.open()}></Button>
+      <Modal title='模型信息'
+             open={this.state.formOpen}
+             destroyOnClose
+             onOk={() => this.formRef.current.submit()}
+             onCancel={() => this.setState({formOpen: false})}
+             width={700}
+      >
 
-          <Button icon={<SaveOutlined/>} onClick={() => SaveTool.onSaveXml(this.bpmnModeler)}>保存</Button>
-          <Button icon={<CloudUploadOutlined/>} onClick={() => SaveTool.onDeploy(this.bpmnModeler)}>部署</Button>
-          <Button onClick={() => XmlTool.onClick(this.bpmnModeler)}>XML</Button>
-        </div>
-        <span>
-            流程: {this.state.model?.name}
-          </span>
-      </section>
-      <Row gutter={8} wrap={false} style={{height: '90vh', marginTop: 4}}>
-        <Col flex='auto'>
-          <div id={"flow-canvas-" + this.state.id} style={{width: '100%', height: '100%', background: 'white'}}></div>
-        </Col>
+        <Form ref={this.formRef} labelCol={{flex: '100px'}}
+              initialValues={this.state.formValues}
+              onFinish={this.onFinish}>
+          <Form.Item name='id' noStyle>
+          </Form.Item>
+          <Form.Item label='名称' name='name' rules={[{required: true}]}>
+            <Input/>
+          </Form.Item>
+          <Form.Item label='标识Key' name='key' rules={[{required: true}]} help='流程定义的key，全局唯一， 英文'>
+            <Input/>
+          </Form.Item>
+        </Form>
 
-        <Col flex='300px'>
-
-          <Card title='通用' extra={this.state.elementType}>
-            <div>标识：{this.state.elementId}</div>
-            <div>名称：{this.state.elementName}</div>
-          </Card>
-          <div style={{marginTop: 4}}>
-            {this.state.elementType && this.renderForm()}
-          </div>
-        </Col>
-      </Row>
-
-
+      </Modal>
     </div>
   }
 
 
-  renderForm() {
-    const {elementType} = this.state;
-
-    const panelCLass = PropertyPanelMap[elementType]
-    if (panelCLass) {
-      return React.createElement(panelCLass, {
-        bo: this.bo,
-        element: this.element,
-        modeling: this.modeling,
-        moddle: this.moddle,
-        root: this.root
-      })
-    }
-    return <Empty/>
-
-
-  }
 }
+
+
+

@@ -1,7 +1,5 @@
 import React from "react";
 import {message, Modal} from "antd";
-import ModelList from "./ModelList";
-import {URLTool} from "@crec/lang";
 
 const DOM_ID = "flowable-xml-container";
 export default class {
