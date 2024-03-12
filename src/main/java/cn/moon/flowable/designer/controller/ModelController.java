@@ -1,15 +1,12 @@
 
 package cn.moon.flowable.designer.controller;
 
-import cn.moon.flowable.designer.domain.FlowModel;
 import cn.moon.flowable.designer.manager.ModelManager;
-import cn.moon.lang.json.JsonTool;
 import cn.moon.lang.web.Option;
 import cn.moon.lang.web.Result;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.*;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -29,7 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 流程模型控制器
@@ -52,7 +48,7 @@ public class ModelController {
     private ModelManager modelManager;
 
     @GetMapping("list")
-    public Result page(String keyword) {
+    public Result list(String keyword) {
         ModelQuery query = repositoryService.createModelQuery();
 
         if (keyword != null) {
@@ -61,25 +57,14 @@ public class ModelController {
 
         List<Model> list = query.orderByLastUpdateTime().desc().list();
 
-        List<FlowModel> modelList = list.stream().map(this::convertVo).collect(Collectors.toList());
-
-        return Result.ok().data(modelList);
+        return Result.ok().data(list);
     }
 
     @PostMapping("save")
-    public Result save(@RequestBody FlowModel param) {
-        String key = param.getKey();
-        String id = param.getId();
-        String name = param.getName();
+    public Result save(String id, String key, String name, String category, String tenantId) {
 
-        Assert.notNull(key, "key不能为空");
-        Model model = id == null ? repositoryService.newModel() : repositoryService.getModel(id);
+        modelManager.saveOrUpdate(id, key, name, category, tenantId);
 
-        model.setName(name);
-        model.setKey(key);
-        model.setMetaInfo(JsonTool.toJsonQuietly(param));
-
-        repositoryService.saveModel(model);
         return Result.ok();
     }
 
@@ -87,18 +72,23 @@ public class ModelController {
     @GetMapping("detail")
     public Result detail(@RequestParam String id) {
         Model model = repositoryService.getModel(id);
-        FlowModel flowModel = convertVo(model);
+
+        Map<String, Object> detail = new HashMap<>();
+        detail.put("id", model.getId());
+        detail.put("name", model.getName());
+        detail.put("key", model.getKey());
+
 
         byte[] source = repositoryService.getModelEditorSource(id);
 
         if (source == null) {
             BpmnModel defaultModel = modelManager.createTemplateModel(model.getKey(), model.getName());
-            flowModel.setXml(modelManager.modelToXml(defaultModel));
+            detail.put("xml", modelManager.modelToXml(defaultModel));
         } else {
-            flowModel.setXml(new String(source, StandardCharsets.UTF_8));
+            detail.put("xml", new String(source, StandardCharsets.UTF_8));
         }
 
-        return Result.ok().data(flowModel);
+        return Result.ok().data(detail);
     }
 
     @GetMapping("delete")
@@ -137,8 +127,8 @@ public class ModelController {
                 UserTask task = (UserTask) flowElement;
 
                 if (task.getAssignee() == null &&
-                        CollectionUtils.isEmpty(task.getCandidateUsers()) &&
-                        CollectionUtils.isEmpty(task.getCandidateGroups())) {
+                    CollectionUtils.isEmpty(task.getCandidateUsers()) &&
+                    CollectionUtils.isEmpty(task.getCandidateGroups())) {
                     //  throw new IllegalArgumentException("请指定分配对象");
                 }
 
@@ -212,15 +202,6 @@ public class ModelController {
         }
     }
 
-    private FlowModel convertVo(Model model) {
-        String metaInfo = model.getMetaInfo();
-
-        FlowModel flowModel = JsonTool.jsonToBeanQuietly(metaInfo, FlowModel.class);
-        flowModel.setId(model.getId());
-        flowModel.setUpdateTime(DateFormatUtils.format(model.getLastUpdateTime(), "yyyy-MM-dd HH:mm:ss"));
-
-        return flowModel;
-    }
 
     @ExceptionHandler(Exception.class)
     public Result exception(Exception e) {

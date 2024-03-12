@@ -2,6 +2,7 @@ import {Button, Form, Input, message, Modal, Popconfirm, Space, Table} from 'ant
 import React from 'react';
 import {PlusOutlined} from "@ant-design/icons";
 import {HttpClient} from "@crec/lang";
+import moment from "moment";
 
 const baseTitle = "流程模型";
 const baseApi = 'flowable/model/';
@@ -21,8 +22,8 @@ export default class extends React.Component {
 
   state = {
     formValues: {},
-    formOpen:false,
-    list:[]
+    formOpen: false,
+    list: []
   }
 
   actionRef = React.createRef();
@@ -34,7 +35,7 @@ export default class extends React.Component {
       title: '名称',
       dataIndex: 'name',
       sorter: true,
-      render:(_, record)=>{
+      render: (_, record) => {
         return <a href={this.getDesignUrl(record)}>{record.name}</a>
       }
     },
@@ -42,12 +43,28 @@ export default class extends React.Component {
       title: '编码',
       dataIndex: 'key'
     },
+    {
+      title: '分类',
+      dataIndex: 'category'
+    },
+    {
+      title: '租户',
+      dataIndex: 'tenantId'
+    },
+
 
     {
+      title: '修订版本',
+      dataIndex: 'revision'
+    },
+    {
       title: '更新时间',
-      dataIndex: 'updateTime',
+      dataIndex: 'lastUpdateTime',
       hideInForm: true,
-      hideInSearch: true
+      hideInSearch: true,
+      render(v) {
+        return moment(v).format('YYYY-MM-DD HH:mm:ss')
+      }
     },
 
 
@@ -77,37 +94,36 @@ export default class extends React.Component {
     this.request()
   }
 
-  request = (keyword)=>{
-    HttpClient.get(pageApi,{keyword}).then(rs=>{
-      this.setState({list:rs.data})
+  request = (keyword) => {
+    HttpClient.get(pageApi, {keyword}).then(rs => {
+      this.setState({list: rs.data})
     })
   }
-
 
 
   handleAdd = () => {
     this.setState({
-      formOpen:true,
-      formValues:{}
+      formOpen: true,
+      formValues: {}
     })
   }
 
-  handleEdit = record=>{
+  handleEdit = record => {
     this.setState({
-      formOpen:true,
-      formValues:record
+      formOpen: true,
+      formValues: record
     })
   }
-  onFinish = values=>{
-    HttpClient.post('flowable/model/save',values).then(rs=>{
+  onFinish = values => {
+    HttpClient.postForm('flowable/model/save', values).then(rs => {
       message.success(rs.message)
       this.request()
-      this.setState({formOpen:false})
+      this.setState({formOpen: false})
     })
   }
 
   handleDelete = row => {
-    HttpClient.get(delApi, {id:row.id}).then(rs => {
+    HttpClient.get(delApi, {id: row.id}).then(rs => {
       rs.success ? message.success(rs.message) : message.error(rs.message)
       this.request()
     })
@@ -115,9 +131,9 @@ export default class extends React.Component {
 
 
   render() {
-    return <div style={{padding:12}}>
-      <div style={{marginBottom: 12, display:'flex', justifyContent:'space-between'}}>
-        <Input.Search style={{width: 180, }} onSearch={(e)=>this.request(e)} />
+    return <div style={{padding: 12}}>
+      <div style={{marginBottom: 12, display: 'flex', justifyContent: 'space-between'}}>
+        <Input.Search style={{width: 180,}} onSearch={(e) => this.request(e)}/>
         <Button icon={<PlusOutlined/>} type='primary' onClick={this.handleAdd}>新建</Button>
       </div>
       <Table
@@ -143,7 +159,15 @@ export default class extends React.Component {
           <Form.Item label='名称' name='name' rules={[{required: true}]}>
             <Input/>
           </Form.Item>
-          <Form.Item label='标识Key' name='key' rules={[{required: true}]} help='流程定义的key，全局唯一， 英文'>
+          <Form.Item label='编码' name='key' rules={[{required: true}]} help='流程定义的key，全局唯一， 英文'>
+            <Input/>
+          </Form.Item>
+
+          <Form.Item label='分类' name='category' >
+            <Input/>
+          </Form.Item>
+
+          <Form.Item label='租户' name='tenantId' >
             <Input/>
           </Form.Item>
         </Form>
