@@ -72,6 +72,7 @@ public class ModelController {
     @GetMapping("detail")
     public Result detail(@RequestParam String id) {
         Model model = repositoryService.getModel(id);
+        Assert.state(model != null, "流程模型不存在");
 
         Map<String, Object> detail = new HashMap<>();
         detail.put("id", model.getId());
