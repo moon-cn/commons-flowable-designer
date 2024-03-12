@@ -131,7 +131,7 @@ export default class extends React.Component {
 
 
   render() {
-    return <div style={{padding: 12}}>
+    return <div >
       <div style={{marginBottom: 12, display: 'flex', justifyContent: 'space-between'}}>
         <Input.Search style={{width: 180,}} onSearch={(e) => this.request(e)}/>
         <Button icon={<PlusOutlined/>} type='primary' onClick={this.handleAdd}>新建</Button>

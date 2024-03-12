@@ -41,7 +41,7 @@ export default class extends React.Component {
         },
         contextPad,
       ],
-      moddleExtensions:{
+      moddleExtensions: {
         flowable: flowableDesc
       }
     });
@@ -50,7 +50,7 @@ export default class extends React.Component {
     window._moddle = this.moddle = this.bpmnModeler.get('moddle'); // 数据模型， 主要存储元数据
 
     if (!id) {
-        alert('请先选择或创建模型')
+      alert('请先选择或创建模型')
     } else {
       this.initById(id)
     }
@@ -81,7 +81,7 @@ export default class extends React.Component {
   onSelectionChanged = e => {
     const {newSelection} = e;
     let definitions = this.bpmnModeler.getDefinitions();
-    if(definitions.rootElements == null){
+    if (definitions.rootElements == null) {
       return
     }
     const root = this.root = definitions.rootElements[0]
@@ -104,16 +104,18 @@ export default class extends React.Component {
 
   render() {
 
-    return <div style={{background: '#f5f5f5', padding:12}}>
+    return <div style={{background: '#f5f5f5'}}>
       <section style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-        <div>
-          <Button icon={<SaveOutlined/>} onClick={() => SaveTool.onSaveXml(this.bpmnModeler)}>保存</Button>
-          <Button icon={<CloudUploadOutlined/>} onClick={() => SaveTool.onDeploy(this.bpmnModeler)}>部署</Button>
-          <Button onClick={() => XmlTool.onClick(this.bpmnModeler)}>XML</Button>
-        </div>
         <span>
             流程: {this.state.model?.name}
-          </span>
+        </span>
+        <div style={{display: "flex", justifyContent: "space-around", gap: 8}}>
+          <Button type='primary' icon={<SaveOutlined/>}
+                  onClick={() => SaveTool.onSaveXml(this.bpmnModeler)}>保存</Button>
+          <Button type='primary' danger icon={<CloudUploadOutlined/>}
+                  onClick={() => SaveTool.onDeploy(this.bpmnModeler)}>部署</Button>
+          <Button onClick={() => XmlTool.onClick(this.bpmnModeler)}>XML文本</Button>
+        </div>
       </section>
       <Row gutter={8} wrap={false} style={{height: '90vh', marginTop: 4}}>
         <Col flex='auto'>
@@ -131,11 +133,8 @@ export default class extends React.Component {
           </div>
         </Col>
       </Row>
-
-
     </div>
   }
-
 
   renderForm() {
     const {elementType} = this.state;
