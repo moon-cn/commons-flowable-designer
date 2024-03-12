@@ -32,12 +32,12 @@ export default class extends React.Component {
       return <StartEventTimer {...childProps}/>
     }
 
-    return <StartForm {...childProps}/>
+    return <NodeForm {...childProps}/>
   }
 }
 
 
-class StartForm extends React.Component {
+class NodeForm extends React.Component {
 
   onValuesChange = (changed, values) => {
     const {element, bo, modeling, moddle} = this.props
@@ -48,9 +48,9 @@ class StartForm extends React.Component {
       ModelerUtil.updateProperties(modeling, element, {
         formKey
       })
-
       return
     }
+
     if (changed.formProperties) {
       // 忽略新增
       for(let item of formProperties){
@@ -64,16 +64,21 @@ class StartForm extends React.Component {
         const {id,name, type} = prop;
         return moddle.create('flowable:FormProperty', {id,name, type});
       })
-      bo.extensionElements.set('values',props)
-
+      if(bo.extensionElements){
+        bo.extensionElements.set('values',props)
+      }else {
+        const extensionElements =  moddle.create('bpmn:ExtensionElements',{values: props})
+        modeling.updateProperties(element, {extensionElements})
+      }
     }
   }
 
 
   render() {
     const bo = this.props.bo;
-    const list = bo.extensionElements.values
+    const list = bo.extensionElements?.values
     const data = ModelerUtil.getData(bo)
+    data.formKey = bo.formKey
 
     return <Card title='表单'>
       <Form onValuesChange={this.onValuesChange} size="small">

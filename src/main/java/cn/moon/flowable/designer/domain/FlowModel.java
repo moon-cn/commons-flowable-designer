@@ -24,7 +24,6 @@ public class FlowModel {
      */
     private String name;
 
-    private List<ConditionVariable> conditionVariableList;
 
 
     private String formUrl;

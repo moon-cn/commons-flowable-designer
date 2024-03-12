@@ -35,7 +35,8 @@ export default class {
 
   static handleChangeXml = (bpmnModeler) => {
     const xml = document.getElementById(DOM_ID).innerText
-    const root = bpmnModeler.getDefinitions().rootElements[0]
+    let definitions = bpmnModeler.getDefinitions();
+    const root = definitions.rootElements[0]
     const {id, name} = root;
 
 

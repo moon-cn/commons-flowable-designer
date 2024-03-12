@@ -3,7 +3,6 @@ package cn.moon.flowable.designer.controller;
 
 import cn.moon.flowable.designer.domain.FlowModel;
 import cn.moon.flowable.designer.manager.ModelManager;
-import cn.moon.flowable.designer.tool.BpmnModelXmlTool;
 import cn.moon.lang.json.JsonTool;
 import cn.moon.lang.web.Option;
 import cn.moon.lang.web.Result;
@@ -67,6 +66,24 @@ public class ModelController {
         return Result.ok().data(modelList);
     }
 
+    @PostMapping("save")
+    public Result save(@RequestBody FlowModel param) {
+        String key = param.getKey();
+        String id = param.getId();
+        String name = param.getName();
+
+        Assert.notNull(key, "key不能为空");
+        Model model = id == null ? repositoryService.newModel() : repositoryService.getModel(id);
+
+        model.setName(name);
+        model.setKey(key);
+        model.setMetaInfo(JsonTool.toJsonQuietly(param));
+
+        repositoryService.saveModel(model);
+        return Result.ok();
+    }
+
+
     @GetMapping("detail")
     public Result detail(@RequestParam String id) {
         Model model = repositoryService.getModel(id);
@@ -75,12 +92,11 @@ public class ModelController {
         byte[] source = repositoryService.getModelEditorSource(id);
 
         if (source == null) {
-            String defaultModel = modelManager.createTemplate(model.getKey(), model.getName());
-            flowModel.setXml(defaultModel);
+            BpmnModel defaultModel = modelManager.createTemplateModel(model.getKey(), model.getName());
+            flowModel.setXml(modelManager.modelToXml(defaultModel));
         } else {
             flowModel.setXml(new String(source, StandardCharsets.UTF_8));
         }
-        System.err.println(flowModel.getXml());
 
         return Result.ok().data(flowModel);
     }
@@ -91,24 +107,11 @@ public class ModelController {
         return Result.ok();
     }
 
-    @PostMapping("save")
-    public Result save(@RequestBody FlowModel param) {
-        Assert.notNull(param.getKey(), "key不能为空");
-        Model model = param.getId() == null ? repositoryService.newModel() : repositoryService.getModel(param.getId());
-
-
-        model.setName(param.getName());
-        model.setKey(param.getKey());
-        model.setMetaInfo(JsonTool.toJsonQuietly(param));
-
-        repositoryService.saveModel(model);
-        return Result.ok();
-    }
 
     @PostMapping("saveContent")
     public Result saveContent(@RequestParam String id, @RequestParam String xml) {
         repositoryService.addModelEditorSource(id, xml.getBytes(StandardCharsets.UTF_8));
-        BpmnModel bpmnModel = BpmnModelXmlTool.xmlToModel(xml);
+        BpmnModel bpmnModel = modelManager.xmlToModel(xml);
         validateModel(bpmnModel);
         return Result.ok();
     }
@@ -122,7 +125,7 @@ public class ModelController {
 
         repositoryService.addModelEditorSource(id, xml.getBytes(StandardCharsets.UTF_8));
 
-        BpmnModel bpmnModel = BpmnModelXmlTool.xmlToModel(xml);
+        BpmnModel bpmnModel = modelManager.xmlToModel(xml);
         validateModel(bpmnModel);
 
         Process mainProcess = bpmnModel.getMainProcess();

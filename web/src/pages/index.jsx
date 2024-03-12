@@ -22,7 +22,6 @@ export default class extends React.Component {
 
   state = {
     model: null,
-    conditionVariable: null,
 
     elementType: null,
     elementName: '',
@@ -65,7 +64,7 @@ export default class extends React.Component {
     if (id) {
       this.setState({id})
       HttpClient.get('flowable/model/detail', {id}).then(rs => {
-        this.setState({model: rs.data, conditionVariable: rs.conditionVariable})
+        this.setState({model: rs.data})
         this.initBpmn(rs.data.xml)
       })
     }
@@ -76,6 +75,7 @@ export default class extends React.Component {
     const id = '#flow-canvas-' + this.state.id
     this.bpmnModeler.attachTo(id);
     this.bpmnModeler.importXML(xml)
+    console.log(xml)
 
     this.bpmnModeler.on('element.contextmenu', e => e.preventDefault()) // 关闭右键，影响操作
     this.bpmnModeler.on('selection.changed', this.onSelectionChanged);
@@ -84,7 +84,11 @@ export default class extends React.Component {
 
   onSelectionChanged = e => {
     const {newSelection} = e;
-    const root = this.root = this.bpmnModeler.getDefinitions().rootElements[0]
+    let definitions = this.bpmnModeler.getDefinitions();
+    if(definitions.rootElements == null){
+      return
+    }
+    const root = this.root = definitions.rootElements[0]
     const element = this.element = newSelection[0] || root
     const bo = window._bo = this.bo = getBusinessObject(element)
 
