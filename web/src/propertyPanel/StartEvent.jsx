@@ -4,8 +4,19 @@ import ModelerUtil from "../utils/ModelerUtil";
 import StartEventTimer from "./StartEventTimer";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 
+
+/**
+ * // 支持的格式参考
+ *  org.flowable.engine.impl.form
+ * "enum"
+ * "date" -> {org.flowable.engine.impl.form.DateFormType}
+ * "boolean" -> {org.flowable.engine.impl.form.BooleanFormType}
+ * "string" -> {org.flowable.engine.impl.form.StringFormType}
+ * "double" -> {org.flowable.engine.impl.form.DoubleFormType}
+ * "long" -> {org.flowable.engine.impl.form.LongFormType}
+ */
 const typeMap = {
-  text: '文本',
+  string: '文本',
   long: '整数',
   double: '小数',
   date: '日期',
